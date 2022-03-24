@@ -1,0 +1,72 @@
+from sense_hat import SenseHat
+import time
+import datetime
+
+sense = SenseHat()
+
+green = (0, 128, 0)
+red = (128, 0, 0)
+blue = (0, 0, 128)
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+print("AmbSnooper v0.1")
+
+def update_screen(mode, show_letter = False):
+  now = datetime.datetime.now()
+ 
+  temp = sense.temp
+  temp_disp = str.format("%.2f" % temp)
+ 
+  pressure = sense.pressure
+  pressure_disp = str.format("%.2f" % pressure)
+ 
+  humidity = sense.humidity
+  humidity_disp = str.format("%.2f" % humidity)
+
+  print("Fecha y hora: " + now.strftime("%Y-%m-%d %H:%M:%S"))
+  print("Temp:" + temp_disp + " C")
+  print("Pres:" + pressure_disp + " mB")
+  print("Hum:" + humidity_disp + " %")
+
+  sense.show_message("Hora y fecha: " + now.strftime("%Y-%m-%d %H:%M:%S"), scroll_speed=0.04, back_colour = black)
+  sense.show_message(temp_disp + " C", scroll_speed=0.04, back_colour = red)
+  sense.show_message(temp_disp + " mB", scroll_speed=0.04, back_colour = green)
+  sense.show_message(temp_disp + " %", scroll_speed=0.04, back_colour = blue)
+
+####
+# Intro Animation
+####
+
+
+update_screen("temp")
+
+index = 0
+sensors = ["temp", "pressure", "humidity"]
+
+####
+# Main game loop
+####
+
+while True:
+  selection = False
+  events = sense.stick.get_events()
+  for event in events:
+	# Skip releases
+	if event.action != "released":
+  	if event.direction == "left":
+    	index -= 1
+    	selection = True
+  	elif event.direction == "right":
+    	index += 1
+    	selection = True
+  	if selection:
+    	current_mode = sensors[index % 3]
+ 
+  if not selection:
+	current_mode = sensors[index % 3]
+	update_screen(current_mode)
+	time.sleep(0.5)
+ 
+
+
